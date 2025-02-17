@@ -32,10 +32,6 @@ public class CharacterMovement : MonoBehaviour
         Vector2 inputValue = ctx.ReadValue<Vector2>();
         speedX.TargetValue = inputValue.x;
         speedY.TargetValue = inputValue.y;
-        if (inputValue.magnitude > .1f)
-        {
-            SolveCharacterRotation();
-        }
     }
     
     private void Awake()
@@ -51,6 +47,9 @@ public class CharacterMovement : MonoBehaviour
         speedY.Update();
         animator.SetFloat(speedXHash, speedX.CurrentValue);
         animator.SetFloat(speedYHash, speedY.CurrentValue);
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, angularSpeed);
+        SolveCharacterRotation();
+        float speedMagnitude =
+            Mathf.Sqrt(speedX.TargetValue * speedX.TargetValue + speedY.TargetValue * speedY.TargetValue);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, angularSpeed * Mathf.SmoothStep(0, 0.1f, speedMagnitude));
     }
 }
