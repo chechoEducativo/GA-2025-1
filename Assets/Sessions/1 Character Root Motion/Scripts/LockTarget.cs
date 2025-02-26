@@ -12,7 +12,12 @@ public class LockTarget : MonoBehaviour, ICharacterComponent
     
     public void OnLock(InputAction.CallbackContext ctx)
     {
-        if (!ctx.performed) return;
+        if (!ctx.started) return;
+        if (ParentCharacter.LockTarget != null)
+        {
+            ParentCharacter.LockTarget = null;
+            return;
+        }
         Collider[] detectedObjects = Physics.OverlapSphere(transform.position, detectionRadius, detectionMask);
         if (detectedObjects.Length == 0) return;
         float nearestAngle = detectionAngle;
@@ -37,9 +42,10 @@ public class LockTarget : MonoBehaviour, ICharacterComponent
         ParentCharacter.LockTarget = detectedObjects[closestObject].transform;
     }
     
-    private void Update()
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
     {
+        Gizmos.DrawWireSphere(transform.position, detectionRadius);
     }
-
-    
+#endif
 }

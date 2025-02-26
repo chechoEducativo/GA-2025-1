@@ -41,8 +41,9 @@ public class CharacterLook : MonoBehaviour, ICharacterComponent
             return;
         }
 
-        target.RotateAround(target.position, transform.up, horizontalDampener.CurrentValue * horizontalRotationSpeed * Time.deltaTime);
-        verticalRotation += verticalDampener.CurrentValue * verticalRotationSpeed * Time.deltaTime;
+        #warning Reset rotation while locked
+        target.RotateAround(target.position, transform.up, horizontalDampener.CurrentValue * horizontalRotationSpeed * 360 * Time.deltaTime);
+        verticalRotation += verticalDampener.CurrentValue * verticalRotationSpeed * 360 * Time.deltaTime;
         verticalRotation = Mathf.Clamp(verticalRotation, verticalRotationLimits.x, verticalRotationLimits.y);
         Vector3 euler = target.localEulerAngles;
         euler.x = verticalRotation;
