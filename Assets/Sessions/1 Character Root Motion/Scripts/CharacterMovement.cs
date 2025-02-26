@@ -30,8 +30,13 @@ public class CharacterMovement : MonoBehaviour, ICharacterComponent
     private void ApplyCharacterRotation()
     {
         float motionMagnitude = Mathf.Sqrt(speedX.TargetValue * speedX.TargetValue + speedY.TargetValue * speedY.TargetValue);
-        float rotationSpeed = ParentCharacter.IsAiming ? 1 : Mathf.SmoothStep(0, .1f, motionMagnitude);
+        float rotationSpeed = Mathf.SmoothStep(0, .1f, motionMagnitude);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, angularSpeed * rotationSpeed);
+    }
+
+    private void ApplyCharacterRotationAnimation()
+    {
+        
     }
     
     public void OnMove(InputAction.CallbackContext ctx)
@@ -55,7 +60,10 @@ public class CharacterMovement : MonoBehaviour, ICharacterComponent
         animator.SetFloat(speedXHash, speedX.CurrentValue);
         animator.SetFloat(speedYHash, speedY.CurrentValue);
         SolveCharacterRotation();
-        ApplyCharacterRotation();
+        if(ParentCharacter.IsAiming)
+            ApplyCharacterRotationAnimation();
+        else
+            ApplyCharacterRotation();
     }
 
     public Character ParentCharacter { get; set; }
