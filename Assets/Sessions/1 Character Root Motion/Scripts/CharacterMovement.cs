@@ -8,6 +8,8 @@ public class CharacterMovement : MonoBehaviour, ICharacterComponent
     [SerializeField] private FloatDampener speedX;
     [SerializeField] private FloatDampener speedY;
     [SerializeField] private float angularSpeed;
+    [SerializeField] private Transform aimTarget;
+    [SerializeField] private float turnThreshold;
     
     private Animator animator;
 
@@ -29,14 +31,21 @@ public class CharacterMovement : MonoBehaviour, ICharacterComponent
 
     private void ApplyCharacterRotation()
     {
+        
+        float aimVector = 1;
         float motionMagnitude = Mathf.Sqrt(speedX.TargetValue * speedX.TargetValue + speedY.TargetValue * speedY.TargetValue);
         float rotationSpeed = Mathf.SmoothStep(0, .1f, motionMagnitude);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, angularSpeed * rotationSpeed);
     }
 
-    private void ApplyCharacterRotationAnimation()
+    private void ApplyCharacterRotationFromAim()
     {
-        
+        Vector3 forward = transform.forward;
+        Vector3 aimForward = Vector3.ProjectOnPlane(aimTarget.forward, transform.up).normalized;
+        float angle = Vector3.SignedAngle(forward, aimForward, transform.up);
+        float rotationSpeed = Mathf.SmoothStep(0, 1,Mathf.Abs(angle) / 360) ;
+        Debug.Log(rotationSpeed);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, angularSpeed * rotationSpeed);
     }
     
     public void OnMove(InputAction.CallbackContext ctx)
@@ -61,7 +70,7 @@ public class CharacterMovement : MonoBehaviour, ICharacterComponent
         animator.SetFloat(speedYHash, speedY.CurrentValue);
         SolveCharacterRotation();
         if(ParentCharacter.IsAiming)
-            ApplyCharacterRotationAnimation();
+            ApplyCharacterRotationFromAim();
         else
             ApplyCharacterRotation();
     }
